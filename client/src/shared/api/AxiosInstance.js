@@ -22,10 +22,13 @@ const useApi = () => {
     const resId = axiosInstance.interceptors.response.use(
       (response) => response,
       async (error) => {
-        // refresh-token call khud fail hui ho to usko retry mat karo, warna infinite loop
-        const isRefreshCall = error.config?.url?.includes("/auth/refresh-token");
+        const url = error.config?.url || "";
+        const isAuthFlowCall =
+          url.includes("/auth/refresh-token") ||
+          url.includes("/auth/login") ||
+          url.includes("/auth/register");
 
-        if (error.response?.status === 401 && !error.config._retry && !isRefreshCall) {
+        if (error.response?.status === 401 && !error.config._retry && !isAuthFlowCall) {
           error.config._retry = true;
           try {
             const { data } = await axiosInstance.post("/auth/refresh-token");
@@ -34,7 +37,6 @@ const useApi = () => {
             error.config.headers.Authorization = `Bearer ${newToken}`;
             return axiosInstance(error.config);
           } catch (refreshErr) {
-            // refresh bhi fail hua — genuinely logged out hai, loop mat bana
             setAccessToken(null);
             return Promise.reject(refreshErr);
           }
