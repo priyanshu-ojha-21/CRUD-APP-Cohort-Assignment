@@ -81,7 +81,7 @@ export default function ProductForm({ mode = "create", initialData = null, onSub
             onChange={handleChange}
             className={inputClass}
           />
-          <span className="text-[0.72rem] text-[#8b8a85]">Multiple links ko comma se alag kar</span>
+          <span className="text-[0.72rem] text-[#8b8a85]">Seperate the multiple links by comma</span>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
