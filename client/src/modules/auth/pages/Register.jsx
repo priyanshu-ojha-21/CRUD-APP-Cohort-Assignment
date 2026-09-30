@@ -42,14 +42,19 @@ export default function RegisterPage() {
     const [error, setError] = useState("");
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError("");
-        try {
-            await register(form);
-            navigate("/login");   // register pe tokens nahi milte (yaad hai?), isliye login pe bhej do
-        } catch (err) {
-            setError(err.response?.data?.message || "Something went wrong");
+      e.preventDefault();
+      setError("");
+      try {
+          await register(form);
+          navigate("/login");   // register pe tokens nahi milte (yaad hai?), isliye login pe bhej do
+      } catch (err) {
+        const resData = err.response?.data;
+        if (resData?.errors?.length) {
+            setError(resData.errors.map((er) => er.msg).join(" | "));
+        } else {
+            setError(resData?.message || "Something went wrong");
         }
+      }
     };
 
   return (
@@ -61,6 +66,13 @@ export default function RegisterPage() {
       <h2 className="font-display font-medium text-3xl mb-8">Create account</h2>
 
       <form className="flex flex-col gap-[1.15rem]" onSubmit={handleSubmit} noValidate>
+
+        {error && (
+          <div className="text-sm text-[#b3452c] bg-[#b3452c]/[0.08] border border-[#b3452c]/25 rounded-[3px] px-3.5 py-2.5">
+              {error}
+          </div>
+        )}
+
         <div className="flex flex-col gap-1.5">
           <label htmlFor="name" className="text-[0.8rem] text-[#2a2c34]">
             Full name
